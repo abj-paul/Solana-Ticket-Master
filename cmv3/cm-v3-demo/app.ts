@@ -59,14 +59,23 @@ async function updateCandyMachine() {
     const { response } = await METAPLEX.candyMachines().update({
         candyMachine,
         guards: {
-            startDate: { date: toDateTime("2023-01-17T16:00:00Z") },
+            startDate: { 
+                date: toDateTime("2024-01-17T16:00:00Z") 
+            },
+            endDate: {
+                date: toDateTime("2024-1-30T15:30:00.000Z"),
+            },
             mintLimit: {
                 id: 1,
-                limit: 2,
+                limit: 5,
             },
             solPayment: {
                 amount: sol(0.1),
                 destination: METAPLEX.identity().publicKey,
+            },
+            botTax: {
+                lamports: sol(0.01),
+                lastInstruction: true,
             },
         }
     })
@@ -110,8 +119,8 @@ async function mintNft() {
 }
 //createCollectionNft()
 //generateCandyMachine()
-//updateCandyMachine()
+updateCandyMachine()
 //addTickets()
-mintNft()
+//mintNft()
 .then((data)=>{
 })
