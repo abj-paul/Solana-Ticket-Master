@@ -16,3 +16,11 @@ You should get output similar to below if you execute it 5 times as mentioned. N
 #+begin_src bash
 
 #+end_src
+
+* Reference
+We followed [[https://www.quicknode.com/guides/solana-development/nfts/how-to-create-a-solana-nft-collection-using-candy-machine-v3-and-typescript#set-up-your-project][this guide]] to get the boilerplate code. 
+
+We will now follow [[https://docs.metaplex.com/programs/candy-machine/overview][official candy machine documentation]] to add the following features.
+1. Max number of tickets a user can buy
+2. Recording each users who has bought the NFT, serially
+3. If possible, max purchase limit
