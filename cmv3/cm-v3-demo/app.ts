@@ -11,8 +11,8 @@ console.log("Step 1 : Done!");
 
 const WALLET = Keypair.fromSecretKey(new Uint8Array(secret));
 const NFT_METADATA = 'https://mfp2m2qzszjbowdjl2vofmto5aq6rtlfilkcqdtx2nskls2gnnsa.arweave.net/YV-mahmWUhdYaV6q4rJu6CHozWVC1CgOd9NkpctGa2Q'; 
-const COLLECTION_NFT_MINT = ''; 
-const CANDY_MACHINE_ID = '';
+const COLLECTION_NFT_MINT = 'FFvUxgwf7gGbuyzR4dAkBaAbEMTErEd1VBedhzNxSx28'; 
+const CANDY_MACHINE_ID = 'A2qVUfoxdeMpxh78omL4RVs4gFbgeHvghS2CvoNev6GM';
 
 const METAPLEX = Metaplex.make(SOLANA_CONNECTION)
     .use(keypairIdentity(WALLET));
@@ -32,7 +32,85 @@ async function createCollectionNft() {
         console.log(`     https://explorer.solana.com/address/${collectionNft.address.toString()}?cluster=devnet`);
 }
 
-createCollectionNft()
+async function generateCandyMachine() {
+    const candyMachineSettings: CreateCandyMachineInput<DefaultCandyGuardSettings> =
+        {
+            itemsAvailable: toBigNumber(3), // Collection Size: 3
+            sellerFeeBasisPoints: 1000, // 10% Royalties on Collection
+            symbol: "DEMO",
+            maxEditionSupply: toBigNumber(0), // 0 reproductions of each NFT allowed
+            isMutable: true,
+            creators: [
+                { address: WALLET.publicKey, share: 100 },
+            ],
+            collection: {
+                address: new PublicKey(COLLECTION_NFT_MINT), // Can replace with your own NFT or upload a new one
+                updateAuthority: WALLET,
+            },
+        };
+    const { candyMachine } = await METAPLEX.candyMachines().create(candyMachineSettings);
+    console.log(`✅ - Created Candy Machine: ${candyMachine.address.toString()}`);
+    console.log(`     https://explorer.solana.com/address/${candyMachine.address.toString()}?cluster=devnet`);
+}
+
+async function updateCandyMachine() {
+    const candyMachine = await METAPLEX
+        .candyMachines()
+        .findByAddress({ address: new PublicKey(CANDY_MACHINE_ID) });
+
+    const { response } = await METAPLEX.candyMachines().update({
+        candyMachine,
+        guards: {
+            startDate: { date: toDateTime("2022-10-17T16:00:00Z") },
+            mintLimit: {
+                id: 1,
+                limit: 2,
+            },
+            solPayment: {
+                amount: sol(0.1),
+                destination: METAPLEX.identity().publicKey,
+            },
+        }
+    })
+    
+    console.log(`✅ - Updated Candy Machine: ${CANDY_MACHINE_ID}`);
+    console.log(`     https://explorer.solana.com/tx/${response.signature}?cluster=devnet`);
+}
+
+async function addItems() {
+    const candyMachine = await METAPLEX
+        .candyMachines()
+        .findByAddress({ address: new PublicKey(CANDY_MACHINE_ID) }); 
+    const items = [];
+    for (let i = 0; i < 3; i++ ) { // Add 3 NFTs (the size of our collection)
+        items.push({
+            name: `QuickNode Demo NFT # ${i+1}`,
+            uri: NFT_METADATA
+        })
+    }
+    const { response } = await METAPLEX.candyMachines().insertItems({
+        candyMachine,
+        items: items,
+      },{commitment:'finalized'});
+
+    console.log(`✅ - Items added to Candy Machine: ${CANDY_MACHINE_ID}`);
+    console.log(`     https://explorer.solana.com/tx/${response.signature}?cluster=devnet`);
+}
+
+async function mintNft() {
+    const candyMachine = await METAPLEX
+        .candyMachines()
+        .findByAddress({ address: new PublicKey(CANDY_MACHINE_ID) }); 
+    let { nft, response } = await METAPLEX.candyMachines().mint({
+        candyMachine,
+        collectionUpdateAuthority: WALLET.publicKey,
+        },{commitment:'finalized'})
+
+    console.log(`✅ - Minted NFT: ${nft.address.toString()}`);
+    console.log(`     https://explorer.solana.com/address/${nft.address.toString()}?cluster=devnet`);
+    console.log(`     https://explorer.solana.com/tx/${response.signature}?cluster=devnet`);
+}
+
+mintNft()
 .then((data)=>{
-    console.log("Step 3 : Done!");
 })
