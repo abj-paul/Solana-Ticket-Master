@@ -7,21 +7,19 @@ const QUICKNODE_RPC = 'https://solana-devnet.g.alchemy.com/v2/MinrZVld3RStLg4EBI
 const SESSION_HASH = 'QNDEMO'+Math.ceil(Math.random() * 1e9); // Random unique identifier for your session
 const SOLANA_CONNECTION = new Connection(QUICKNODE_RPC, { commitment: 'finalized' , httpHeaders: {"x-session-hash": SESSION_HASH}});
 
-console.log("Step 1 : Done!");
-
 const WALLET = Keypair.fromSecretKey(new Uint8Array(secret));
 const NFT_METADATA = 'https://mfp2m2qzszjbowdjl2vofmto5aq6rtlfilkcqdtx2nskls2gnnsa.arweave.net/YV-mahmWUhdYaV6q4rJu6CHozWVC1CgOd9NkpctGa2Q'; 
-const COLLECTION_NFT_MINT = 'FFvUxgwf7gGbuyzR4dAkBaAbEMTErEd1VBedhzNxSx28'; 
-const CANDY_MACHINE_ID = 'A2qVUfoxdeMpxh78omL4RVs4gFbgeHvghS2CvoNev6GM';
+const COLLECTION_NFT_MINT = 'GUrxDTKvmMLv6gdMS8EMqhauVq1p9vjYQQ48b4WE9rZ'; 
+const CANDY_MACHINE_ID = 'G4suGCZ3PokhsdL15Jyru22aeFBExKxmJLvaPsTRFEoh';
 
 const METAPLEX = Metaplex.make(SOLANA_CONNECTION)
     .use(keypairIdentity(WALLET));
 
-console.log("Step 2 : Done!");
+console.log("Account Loading : Done!");
 
 async function createCollectionNft() {
     const { nft: collectionNft } = await METAPLEX.nfts().create({
-        name: "QuickNode Demo NFT Collection",
+        name: "Ticket Master NFT Collection",
         uri: NFT_METADATA,
         sellerFeeBasisPoints: 0,
         isCollection: true,
@@ -37,7 +35,7 @@ async function generateCandyMachine() {
         {
             itemsAvailable: toBigNumber(3), // Collection Size: 3
             sellerFeeBasisPoints: 1000, // 10% Royalties on Collection
-            symbol: "DEMO",
+            symbol: "TM",
             maxEditionSupply: toBigNumber(0), // 0 reproductions of each NFT allowed
             isMutable: true,
             creators: [
@@ -61,7 +59,7 @@ async function updateCandyMachine() {
     const { response } = await METAPLEX.candyMachines().update({
         candyMachine,
         guards: {
-            startDate: { date: toDateTime("2022-10-17T16:00:00Z") },
+            startDate: { date: toDateTime("2023-01-17T16:00:00Z") },
             mintLimit: {
                 id: 1,
                 limit: 2,
@@ -77,14 +75,14 @@ async function updateCandyMachine() {
     console.log(`     https://explorer.solana.com/tx/${response.signature}?cluster=devnet`);
 }
 
-async function addItems() {
+async function addTickets() {
     const candyMachine = await METAPLEX
         .candyMachines()
         .findByAddress({ address: new PublicKey(CANDY_MACHINE_ID) }); 
     const items = [];
     for (let i = 0; i < 3; i++ ) { // Add 3 NFTs (the size of our collection)
         items.push({
-            name: `QuickNode Demo NFT # ${i+1}`,
+            name: `Ticket NFT # ${i+1}`,
             uri: NFT_METADATA
         })
     }
@@ -93,7 +91,7 @@ async function addItems() {
         items: items,
       },{commitment:'finalized'});
 
-    console.log(`✅ - Items added to Candy Machine: ${CANDY_MACHINE_ID}`);
+    console.log(`✅ - Tickets added to Candy Machine: ${CANDY_MACHINE_ID}`);
     console.log(`     https://explorer.solana.com/tx/${response.signature}?cluster=devnet`);
 }
 
@@ -110,7 +108,10 @@ async function mintNft() {
     console.log(`     https://explorer.solana.com/address/${nft.address.toString()}?cluster=devnet`);
     console.log(`     https://explorer.solana.com/tx/${response.signature}?cluster=devnet`);
 }
-
+//createCollectionNft()
+//generateCandyMachine()
+//updateCandyMachine()
+//addTickets()
 mintNft()
 .then((data)=>{
 })

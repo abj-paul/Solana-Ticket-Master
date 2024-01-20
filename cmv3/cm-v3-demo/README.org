@@ -1,0 +1,18 @@
+* Installation
+Simply run ~npm install~. To run the app.ts file, simply do ~npx esrun app.ts~.
+
+Uncomment the functions one by one and execute them.
+#+begin_src javascript
+//createCollectionNft()
+//generateCandyMachine()
+updateCandyMachine()
+//addTickets()
+//mintNft()
+.then((data)=>{
+})
+#+end_src
+
+You should get output similar to below if you execute it 5 times as mentioned. Note that, after executing ~generateCandyMachine()~ function, you should update two variables in app.ts. First one is , ~CANDY_MACHINE_ID~ and the other one is, ~COLLECTION_NFT_MINT~. You will see their value in ther terminal after you execute the respective functions.
+#+begin_src bash
+
+#+end_src
