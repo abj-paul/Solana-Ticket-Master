@@ -1,5 +1,5 @@
 {
-  "name": "cm-v3-demo",
+  "name": "token-2022",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -10,8 +10,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@metaplex-foundation/js": "^0.20.1",
-    "@solana/spl-token": "^0.3.11",
+    "@solana/spl-token": "^0.4.0",
     "@solana/web3.js": "^1.89.1"
   }
 }
