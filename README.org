@@ -6,6 +6,14 @@ We followed [[https://www.quicknode.com/guides/solana-development/nfts/how-to-cr
 
 Additionally [[https://github.com/solana-developers/compressed-nfts/blob/master/scripts/createAndMint.ts][this github on compressed NFT]] is extremely helpful.
 
+Finally, We followed [[https://solana.com/developers/guides/token-extensions/getting-started][Official Token 2022 Solana]] documetnation to get nontransferability and Fee Configuration codes. We used them to build our final version of contract which currently resiedes in token-2022/combined.ts file.
+So to run our final program. do the following:
+#+begin_src bash
+cd token-2022
+npm install
+npx esrun combined.ts
+#+end_src
+
 We will now follow [[https://docs.metaplex.com/programs/candy-machine/overview][official candy machine documentation]] to add the following features.
 1. Max number of tickets a user can buy
 2. Recording each users who has bought the NFT, serially
