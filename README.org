@@ -8,6 +8,8 @@ Additionally [[https://github.com/solana-developers/compressed-nfts/blob/master/
 
 Finally, We followed [[https://solana.com/developers/guides/token-extensions/getting-started][Official Token 2022 Solana]] documetnation to get nontransferability and Fee Configuration codes. We used them to build our final version of contract which currently resiedes in token-2022/combined.ts file.
 So to run our final program. do the following:
+
+Also, we got NFT creation code in token-2022 from [[https://www.quicknode.com/guides/solana-development/spl-tokens/token-2022/nft][this link]].
 #+begin_src bash
 cd token-2022
 npm install
