@@ -24,6 +24,9 @@ import {
     createSetAuthorityInstruction,
     createInitializeNonTransferableMintInstruction,
     createInitializeTransferFeeConfigInstruction,
+    createEnableCpiGuardInstruction,
+    burn,
+    closeAccount,
 } from '@solana/spl-token';
 import {
     createInitializeInstruction,
@@ -185,7 +188,7 @@ async function createTokenAndMint(): Promise<[string, string]> {
             field: tokenMetadata.additionalMetadata[2][0],
             value: tokenMetadata.additionalMetadata[2][1],
         }),
-
+        //createEnableCpiGuardInstruction(payer.publicKey, owner.publicKey, [], TOKEN_2022_PROGRAM_ID)
     );
     // Initialize NFT with metadata
     const initSig = await sendAndConfirmTransaction(connection, transaction, [payer, mintKeypair, authority]);
@@ -193,9 +196,47 @@ async function createTokenAndMint(): Promise<[string, string]> {
     const sourceAccount = await createAssociatedTokenAccountIdempotent(connection, payer, mint, owner.publicKey, {}, TOKEN_2022_PROGRAM_ID);
     // Mint NFT to associated token account
     const mintSig = await mintTo(connection, payer, mint, sourceAccount, authority, mintAmount, [], undefined, TOKEN_2022_PROGRAM_ID);
-
+    
+    //await burnNNFT(sourceAccount);
     return [initSig, mintSig];
 
+}
+
+async function burnNNFT(sourceTokenAccount){
+     // Burn tokens
+  let transactionSignature = await burn(
+    connection,
+    payer, // Transaction fee payer
+    sourceTokenAccount, // Burn from
+    mint, // Mint Account address
+    payer.publicKey, // Token Account owner
+    100, // Amount
+    undefined, // Additional signers
+    undefined, // Confirmation options
+    TOKEN_2022_PROGRAM_ID // Token Extension Program ID
+  );
+  
+  console.log(
+    "\nBurn Tokens:",
+    `https://solana.fm/tx/${transactionSignature}?cluster=devnet-solana`
+  );
+  
+  // Close Token Account
+  transactionSignature = await closeAccount(
+    connection,
+    payer, // Transaction fee payer
+    sourceTokenAccount, // Token Account to close
+    payer.publicKey, // Account to receive lamports from closed account
+    payer.publicKey, // Owner of Token Account
+    undefined, // Additional signers
+    undefined, // Confirmation options
+    TOKEN_2022_PROGRAM_ID // Token Extension Program ID
+  );
+  
+  console.log(
+    "\nClose Token Account:",
+    `https://solana.fm/tx/${transactionSignature}?cluster=devnet-solana`
+  );
 }
 
 async function removeMetadataField() {
