@@ -19,21 +19,33 @@ import {
     burn,
     closeAccount,
     createInitializeTransferFeeConfigInstruction,
+    TYPE_SIZE,
+    LENGTH_SIZE,
   } from "@solana/spl-token";
+ import wallet from "./wallet.json";
+import { TokenMetadata, pack } from "@solana/spl-token-metadata";
   
   // Connection to devnet cluster
   const QUICKNODE_RPC = 'https://solana-devnet.g.alchemy.com/v2/MinrZVld3RStLg4EBIFTfi9N7dLADMwU'; // 👈 Replace with your QuickNode Solana Devnet HTTP Endpoint
-  const payer = Keypair.generate();
+  const payer = Keypair.fromSecretKey(new Uint8Array(wallet));
   const mintAuthority = Keypair.generate();
   const mintKeypair = Keypair.generate();
   const mint = mintKeypair.publicKey;
   //const decimals = 2;
+  const metaData: TokenMetadata = {
+    updateAuthority: mint,
+    mint: mint,
+    name: "OPOS",
+    symbol: "OPOS",
+    uri: "https://i.pinimg.com/736x/ca/23/5e/ca235e787ebc3c182d0a89c8629da934.jpg"
+  };
+  
 
   const transferFeeConfigAuthority = Keypair.generate();
   const withdrawWithheldAuthority = Keypair.generate();
 
   // Set the decimals, fee basis points, and maximum fee
-    const decimals = 9;
+    const decimals = 0;
     const feeBasisPoints = 100; // 1%
     const maxFee = BigInt(9 * Math.pow(10, decimals)); // 9 tokens
 
@@ -43,15 +55,21 @@ async function nnft(){
   // Transaction signature returned from sent transaction
   let transactionSignature: string;
 
+  // Size of MetadataExtension 2 bytes for type, 2 bytes for length
+const metadataExtension = TYPE_SIZE + LENGTH_SIZE;
+// Size of metadata
+const metadataLen = pack(metaData).length;
+
+
     // Size of Mint Account with extension
-    const extensions = [ExtensionType.NonTransferable, ExtensionType.TransferFeeConfig]
-    const mintLen = getMintLen(extensions);
+    const extensions = [ExtensionType.NonTransferable, ExtensionType.TransferFeeConfig, ExtensionType.MetadataPointer]
+    const mintLen = getMintLen(extensions) + metadataExtension + metadataLen;
     // Minimum lamports required for Mint Account
     const lamports = await connection.getMinimumBalanceForRentExemption(mintLen);
 
     // Step 1 - Airdrop to Payer
-    const airdropSignature = await connection.requestAirdrop(payer.publicKey, 2 * LAMPORTS_PER_SOL);
-    await connection.confirmTransaction({ signature: airdropSignature, ...(await connection.getLatestBlockhash()) });
+    // const airdropSignature = await connection.requestAirdrop(payer.publicKey, 2 * LAMPORTS_PER_SOL);
+    // await connection.confirmTransaction({ signature: airdropSignature, ...(await connection.getLatestBlockhash()) });
 
 // Instruction to invoke System Program to create new account
 const createAccountInstruction = SystemProgram.createAccount({

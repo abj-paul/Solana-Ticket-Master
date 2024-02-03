@@ -36,20 +36,21 @@ import {
     TokenMetadata,
 } from '@solana/spl-token-metadata';
 
-const QUICKNODE_RPC = 'https://solana-devnet.g.alchemy.com/v2/MinrZVld3RStLg4EBIFTfi9N7dLADMwU'; // 👈 Replace with your QuickNode Solana Devnet HTTP Endpoint
+const QUICKNODE_RPC = 'https://api.testnet.solana.com'; // 👈 Replace with your QuickNode Solana Devnet HTTP Endpoint
 const connection = new Connection(QUICKNODE_RPC, 'confirmed');
+import wallet from "./wallet.json";
 
-const payer = Keypair.generate();
-const authority = Keypair.generate();
-const owner = Keypair.generate();
+const payer = Keypair.fromSecretKey(new Uint8Array(wallet));
+const authority = Keypair.fromSecretKey(new Uint8Array(wallet));
+const owner = Keypair.fromSecretKey(new Uint8Array(wallet));
 const mintKeypair = Keypair.generate();
 const mint = mintKeypair.publicKey;
 
 const transferFeeConfigAuthority = Keypair.generate();
-const withdrawWithheldAuthority = Keypair.generate();
+const withdrawWithheldAuthority = Keypair.fromSecretKey(new Uint8Array(wallet));
 
 // Set the decimals, fee basis points, and maximum fee
-  const decimals = 9;
+  const decimals = 0;
   const feeBasisPoints = 100; // 1%
   const maxFee = BigInt(9 * Math.pow(10, decimals)); // 9 tokens
 
@@ -80,7 +81,7 @@ async function airdropLamports() {
 
 async function main() {
     try {
-        await airdropLamports();
+        // await airdropLamports();
 
         // 1. Create Token and Mint
         const [initSig, mintSig] = await createTokenAndMint();
