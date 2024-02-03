@@ -20,10 +20,11 @@ import {
     closeAccount,
     createInitializeTransferFeeConfigInstruction,
   } from "@solana/spl-token";
+ import wallet from "./wallet.json";
   
   // Connection to devnet cluster
   const QUICKNODE_RPC = 'https://solana-devnet.g.alchemy.com/v2/MinrZVld3RStLg4EBIFTfi9N7dLADMwU'; // 👈 Replace with your QuickNode Solana Devnet HTTP Endpoint
-  const payer = Keypair.generate();
+  const payer = Keypair.fromSecretKey(new Uint8Array(wallet));
   const mintAuthority = Keypair.generate();
   const mintKeypair = Keypair.generate();
   const mint = mintKeypair.publicKey;
@@ -33,7 +34,7 @@ import {
   const withdrawWithheldAuthority = Keypair.generate();
 
   // Set the decimals, fee basis points, and maximum fee
-    const decimals = 9;
+    const decimals = 0;
     const feeBasisPoints = 100; // 1%
     const maxFee = BigInt(9 * Math.pow(10, decimals)); // 9 tokens
 
@@ -50,8 +51,8 @@ async function nnft(){
     const lamports = await connection.getMinimumBalanceForRentExemption(mintLen);
 
     // Step 1 - Airdrop to Payer
-    const airdropSignature = await connection.requestAirdrop(payer.publicKey, 2 * LAMPORTS_PER_SOL);
-    await connection.confirmTransaction({ signature: airdropSignature, ...(await connection.getLatestBlockhash()) });
+    // const airdropSignature = await connection.requestAirdrop(payer.publicKey, 2 * LAMPORTS_PER_SOL);
+    // await connection.confirmTransaction({ signature: airdropSignature, ...(await connection.getLatestBlockhash()) });
 
 // Instruction to invoke System Program to create new account
 const createAccountInstruction = SystemProgram.createAccount({
