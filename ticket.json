@@ -1,0 +1,12 @@
+{
+  "name": "JamPass",
+  "symbol": "JPS",
+  "description": "Taylor Swift Eras Tour Ticket",
+  "image": "https://udreview.com/wp-content/uploads/2023/05/unnamed-file.jpg",
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Blue"
+    }
+  ]
+}
