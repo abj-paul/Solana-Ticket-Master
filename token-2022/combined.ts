@@ -21,6 +21,7 @@ import {
     createInitializeTransferFeeConfigInstruction,
   } from "@solana/spl-token";
  import wallet from "./wallet.json";
+import { TokenMetadata } from "@solana/spl-token-metadata";
   
   // Connection to devnet cluster
   const QUICKNODE_RPC = 'https://solana-devnet.g.alchemy.com/v2/MinrZVld3RStLg4EBIFTfi9N7dLADMwU'; // 👈 Replace with your QuickNode Solana Devnet HTTP Endpoint
@@ -29,6 +30,14 @@ import {
   const mintKeypair = Keypair.generate();
   const mint = mintKeypair.publicKey;
   //const decimals = 2;
+  const metaData: TokenMetadata = {
+    updateAuthority: mint,
+    mint: mint,
+    name: "OPOS",
+    symbol: "OPOS",
+    uri: "https://i.pinimg.com/736x/ca/23/5e/ca235e787ebc3c182d0a89c8629da934.jpg"
+  };
+  
 
   const transferFeeConfigAuthority = Keypair.generate();
   const withdrawWithheldAuthority = Keypair.generate();
