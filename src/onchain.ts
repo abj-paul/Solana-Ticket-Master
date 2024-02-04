@@ -153,15 +153,15 @@ async function mintTicketNFT(ticketOwner: string): Promise<[string, PublicKey]> 
 }
 
 
-async function burnNFT(sourceTokenAccount: PublicKey, mint: PublicKey){
+async function burnNFT(sourceTokenAccount: PublicKey, mint: PublicKey, owner: PublicKey){
      // Burn tokens
   let transactionSignature = await burn(
     connection,
     payer, // Transaction fee payer
     sourceTokenAccount, // Burn from
     mint, // Mint Account address
-    payer.publicKey, // Token Account owner
-    100, // Amount
+    owner, // Token Account owner
+    1, // Amount
     undefined, // Additional signers
     undefined, // Confirmation options
     TOKEN_2022_PROGRAM_ID // Token Extension Program ID
@@ -178,7 +178,7 @@ async function burnNFT(sourceTokenAccount: PublicKey, mint: PublicKey){
     payer, // Transaction fee payer
     sourceTokenAccount, // Token Account to close
     payer.publicKey, // Account to receive lamports from closed account
-    payer.publicKey, // Owner of Token Account
+    owner, // Owner of Token Account
     undefined, // Additional signers
     undefined, // Confirmation options
     TOKEN_2022_PROGRAM_ID // Token Extension Program ID
@@ -200,8 +200,8 @@ export const mintTicket = async (ticketOwner: string) => {
     return mintURL
 }
 
-export const verifyTicket = async (sourceTokenAccount: string, mint: string) => {
-    return await burnNFT(new PublicKey(sourceTokenAccount), new PublicKey(mint));
+export const verifyTicket = async (sourceTokenAccount: string, mint: string, ownerAddress: string) => {
+    return await burnNFT(new PublicKey(sourceTokenAccount), new PublicKey(mint), new PublicKey(ownerAddress));
 }
 
 export async function getNFTs(address:string) {

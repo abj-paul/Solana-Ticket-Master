@@ -30,8 +30,8 @@ export const getNFTEndpoint = async(req: Request, res: Response) => {
 
 export const verifyNFTEndpoint = async(req: Request, res: Response) => {
 
-  const { ata, mintAddress } = req.body;
+  const { ata, mintAddress, ownerAddress } = req.body;
 
-  const url = await verifyTicket(ata as string, mintAddress as string);
+  const url = await verifyTicket(ata as string, mintAddress as string, ownerAddress as string);
   (res as any).json({ success: true, url});
 };
