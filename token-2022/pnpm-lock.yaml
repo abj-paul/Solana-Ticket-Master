@@ -15,6 +15,11 @@ dependencies:
     specifier: ^1.89.1
     version: 1.89.1
 
+devDependencies:
+  prettier:
+    specifier: ^3.2.4
+    version: 3.2.4
+
 packages:
 
   /@babel/runtime@7.23.9:
@@ -358,6 +363,12 @@ packages:
     hasBin: true
     requiresBuild: true
     dev: false
+
+  /prettier@3.2.4:
+    resolution: {integrity: sha512-FWu1oLHKCrtpO1ypU6J0SbK2d9Ckwysq6bHj/uaCP26DxrPpppCLQRGVuqAxSTvhF00AcvDRyYrLNW7ocBhFFQ==}
+    engines: {node: '>=14'}
+    hasBin: true
+    dev: true
 
   /regenerator-runtime@0.14.1:
     resolution: {integrity: sha512-dYnhHh0nJoMfnkZs6GmmhFknAGRrLznOu5nc9ML+EJxGvrx6H7teuevqVqCuPcPK//3eDrrjQhehXVx9cnkGdw==}
