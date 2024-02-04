@@ -1,5 +1,6 @@
 {
   "scripts": {
+    "dev": "nodemon --watch src --exec ts-node src/index.ts",
     "lint:fix": "prettier */*.js \"*/**/*{.js,.ts}\" -w",
     "lint": "prettier */*.js \"*/**/*{.js,.ts}\" --check",
     "client": "yarn run ts-node client/*.ts",
