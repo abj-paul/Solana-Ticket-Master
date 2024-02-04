@@ -68,9 +68,10 @@ function generateExplorerUrl(identifier: string, isAddress: boolean = false): st
 
 
 
-async function mintTicketNFT(ticketOwner: PublicKey): Promise<[string, PublicKey]> {
+async function mintTicketNFT(ticketOwner: string): Promise<[string, PublicKey]> {
     const mintKeypair = Keypair.generate();
     const mint = mintKeypair.publicKey;
+
 
     const tokenMetadata: TokenMetadata = {
         updateAuthority: authority.publicKey,
@@ -139,7 +140,7 @@ async function mintTicketNFT(ticketOwner: PublicKey): Promise<[string, PublicKey
     // Initialize NFT with metadata
     const initSig = await sendAndConfirmTransaction(connection, transaction, [payer, mintKeypair, authority]);
     // Create associated token account
-    const sourceAccount = await createAssociatedTokenAccountIdempotent(connection, payer, mint, ticketOwner, {}, TOKEN_2022_PROGRAM_ID);
+    const sourceAccount = await createAssociatedTokenAccountIdempotent(connection, payer, mint, new PublicKey(ticketOwner), {}, TOKEN_2022_PROGRAM_ID);
     // Mint NFT to associated token account
     const mintSig = await mintTo(connection, payer, mint, sourceAccount, authority, mintAmount, [], undefined, TOKEN_2022_PROGRAM_ID);
    
@@ -185,7 +186,7 @@ async function burnNNFT(sourceTokenAccount: PublicKey, mint: PublicKey){
   );
 }
 
-export const mintTicket = async (ticketOwner: PublicKey) => {
+export const mintTicket = async (ticketOwner: string) => {
     const [mintSig, mint] = await mintTicketNFT(ticketOwner);
     console.log(`   ${generateExplorerUrl(mintSig)}`);
     console.log(`New NFT:`);
