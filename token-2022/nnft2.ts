@@ -6,6 +6,7 @@ import {
     Transaction,
     LAMPORTS_PER_SOL,
     sendAndConfirmTransaction,
+    PublicKey,
 } from '@solana/web3.js';
 import {
     TOKEN_2022_PROGRAM_ID,
@@ -203,7 +204,7 @@ async function createTokenAndMint(): Promise<[string, string]> {
 
 }
 
-async function burnNNFT(sourceTokenAccount){
+async function burnNNFT(sourceTokenAccount: PublicKey){
      // Burn tokens
   let transactionSignature = await burn(
     connection,
