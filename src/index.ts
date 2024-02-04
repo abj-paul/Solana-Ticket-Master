@@ -9,6 +9,7 @@ const port = 3001;
 // API endpoint for a simple test
 app.get('/server', testEndpoint);
 app.post('/mint-ticket', mintTicketEndpoint);
+app.post('/verify-ticket', mintTicketEndpoint);
 
 // Start the server
 app.listen(port, () => {

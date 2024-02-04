@@ -71,7 +71,8 @@ function generateExplorerUrl(identifier: string, isAddress: boolean = false): st
 async function mintTicketNFT(ticketOwner: string): Promise<[string, PublicKey]> {
     const mintKeypair = Keypair.generate();
     const mint = mintKeypair.publicKey;
-
+    console.log({mint});
+    
 
     const tokenMetadata: TokenMetadata = {
         updateAuthority: authority.publicKey,
@@ -149,7 +150,7 @@ async function mintTicketNFT(ticketOwner: string): Promise<[string, PublicKey]> 
 }
 
 
-async function burnNNFT(sourceTokenAccount: PublicKey, mint: PublicKey){
+async function burnNFT(sourceTokenAccount: PublicKey, mint: PublicKey){
      // Burn tokens
   let transactionSignature = await burn(
     connection,
@@ -185,6 +186,8 @@ async function burnNNFT(sourceTokenAccount: PublicKey, mint: PublicKey){
     `https://solana.fm/tx/${transactionSignature}?cluster=devnet-solana`
   );
 }
+
+
 
 export const mintTicket = async (ticketOwner: string) => {
     const [mintSig, mint] = await mintTicketNFT(ticketOwner);
