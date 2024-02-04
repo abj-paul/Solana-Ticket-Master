@@ -167,11 +167,11 @@ async function burnNFT(sourceTokenAccount: PublicKey, mint: PublicKey){
     TOKEN_2022_PROGRAM_ID // Token Extension Program ID
   );
   
+  const burnTxURL = generateExplorerUrl(transactionSignature)
   console.log(
-    "\nBurn Tokens:",
-    `https://solana.fm/tx/${transactionSignature}?cluster=devnet-solana`
+    "\nClose Token Account:",
+    `${burnTxURL}`
   );
-  
   // Close Token Account
   transactionSignature = await closeAccount(
     connection,
@@ -183,11 +183,12 @@ async function burnNFT(sourceTokenAccount: PublicKey, mint: PublicKey){
     undefined, // Confirmation options
     TOKEN_2022_PROGRAM_ID // Token Extension Program ID
   );
-  
+  const closeAccountTxURL = generateExplorerUrl(transactionSignature)
   console.log(
     "\nClose Token Account:",
-    `https://solana.fm/tx/${transactionSignature}?cluster=devnet-solana`
+    `${closeAccountTxURL}`
   );
+  return closeAccountTxURL;
 }
 
 export const mintTicket = async (ticketOwner: string) => {
@@ -199,10 +200,8 @@ export const mintTicket = async (ticketOwner: string) => {
     return mintURL
 }
 
-function decodeAssociatedTokenAddress(associatedTokenAddress) {
-    const decoded = new PublicKey(associatedTokenAddress);
-    const mintAddress = decoded.toBase58().slice(0, 44); // First 44 characters represent the mint address
-    return mintAddress;
+export const verifyTicket = async (sourceTokenAccount: string, mint: string) => {
+    return await burnNFT(new PublicKey(sourceTokenAccount), new PublicKey(mint));
 }
 
 export async function getNFTs(address:string) {
