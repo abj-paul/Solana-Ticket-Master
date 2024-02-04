@@ -142,6 +142,9 @@ async function mintTicketNFT(ticketOwner: string): Promise<[string, PublicKey]> 
     const initSig = await sendAndConfirmTransaction(connection, transaction, [payer, mintKeypair, authority]);
     // Create associated token account
     const sourceAccount = await createAssociatedTokenAccountIdempotent(connection, payer, mint, new PublicKey(ticketOwner), {}, TOKEN_2022_PROGRAM_ID);
+
+    console.log({sourceAccount});
+    
     // Mint NFT to associated token account
     const mintSig = await mintTo(connection, payer, mint, sourceAccount, authority, mintAmount, [], undefined, TOKEN_2022_PROGRAM_ID);
    
@@ -187,8 +190,6 @@ async function burnNFT(sourceTokenAccount: PublicKey, mint: PublicKey){
   );
 }
 
-
-
 export const mintTicket = async (ticketOwner: string) => {
     const [mintSig, mint] = await mintTicketNFT(ticketOwner);
     console.log(`   ${generateExplorerUrl(mintSig)}`);
@@ -197,3 +198,18 @@ export const mintTicket = async (ticketOwner: string) => {
     console.log(`   ${mintURL}`);
     return mintURL
 }
+
+function decodeAssociatedTokenAddress(associatedTokenAddress) {
+    const decoded = new PublicKey(associatedTokenAddress);
+    const mintAddress = decoded.toBase58().slice(0, 44); // First 44 characters represent the mint address
+    return mintAddress;
+}
+
+export async function getNFTs(address:string) {
+    const tokenAccounts = await connection.getParsedTokenAccountsByOwner(
+        new PublicKey(address),
+        { programId: new PublicKey(TOKEN_2022_PROGRAM_ID) } // Token program ID
+      );
+      return tokenAccounts.value;   
+}
+

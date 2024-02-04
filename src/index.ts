@@ -1,5 +1,5 @@
 import express, { Request, Response } from 'express';
-import { testEndpoint, mintTicketEndpoint } from './controller';
+import { testEndpoint, mintTicketEndpoint, getNFTEndpoint } from './controller';
 import bodyParser from 'body-parser';
 
 const app = express();
@@ -10,6 +10,7 @@ const port = 3001;
 app.get('/server', testEndpoint);
 app.post('/mint-ticket', mintTicketEndpoint);
 app.post('/verify-ticket', mintTicketEndpoint);
+app.get('/nft-details', getNFTEndpoint);
 
 // Start the server
 app.listen(port, () => {
