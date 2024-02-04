@@ -43,9 +43,7 @@ import wallet from "../wallet.json";
 
 const payer = Keypair.fromSecretKey(new Uint8Array(wallet));
 const authority = Keypair.fromSecretKey(new Uint8Array(wallet));
-const owner = Keypair.fromSecretKey(new Uint8Array(wallet));
-const mintKeypair = Keypair.generate();
-const mint = mintKeypair.publicKey;
+
 
 const transferFeeConfigAuthority = Keypair.generate();
 const withdrawWithheldAuthority = Keypair.fromSecretKey(new Uint8Array(wallet));
@@ -55,14 +53,7 @@ const withdrawWithheldAuthority = Keypair.fromSecretKey(new Uint8Array(wallet));
   const feeBasisPoints = 100; // 1%
   const maxFee = BigInt(9 * Math.pow(10, decimals)); // 9 tokens
 
-const tokenMetadata: TokenMetadata = {
-    updateAuthority: authority.publicKey,
-    mint: mint,
-    name: 'QN Pixel',
-    symbol: 'QNPIX',
-    uri: "https://qn-shared.quicknode-ipfs.com/ipfs/QmQFh6WuQaWAMLsw9paLZYvTsdL5xJESzcoSxzb6ZU3Gjx",
-    additionalMetadata: [["Background", "Blue"]],
-};
+
 
 //const decimals = 0;
 const mintAmount = 1;
@@ -75,31 +66,21 @@ function generateExplorerUrl(identifier: string, isAddress: boolean = false): st
     return `${baseUrl}/${slug}/${identifier}${localSuffix}`;
 }
 
-async function airdropLamports() {
-    const airdropSignature = await connection.requestAirdrop(payer.publicKey, 2 * LAMPORTS_PER_SOL);
-    await connection.confirmTransaction({ signature: airdropSignature, ...(await connection.getLatestBlockhash()) });
-}
 
-async function main() {
-    try {
-        // await airdropLamports();
 
-        // 1. Create Token and Mint
-        const [initSig, mintSig] = await createTokenAndMint();
-        console.log(`Token created and minted:`);
-        console.log(`   ${generateExplorerUrl(initSig)}`);
-        console.log(`   ${generateExplorerUrl(mintSig)}`);
+async function mintTicketNFT(ticketOwner: PublicKey): Promise<[string, PublicKey]> {
+    const mintKeypair = Keypair.generate();
+    const mint = mintKeypair.publicKey;
 
-        // Log New NFT
-        console.log(`New NFT:`);
-        console.log(`   ${generateExplorerUrl(mint.toBase58(), true)}`);
+    const tokenMetadata: TokenMetadata = {
+        updateAuthority: authority.publicKey,
+        mint: mint,
+        name: 'Jam Pass',
+        symbol: 'JPS',
+        uri: "https://apricot-fashionable-grasshopper-460.mypinata.cloud/ipfs/QmcJYftaYSQDRDVhfhXSuGRKEBvQAAAkyRDYRgGBc7zjpb",
+        additionalMetadata: [["Background", "Blue"]],
+    };
 
-    } catch (err) {
-        console.error(err);
-    }
-}
-
-async function createTokenAndMint(): Promise<[string, string]> {
     // Calculate the minimum balance for the mint account
     const extensions = [ExtensionType.MetadataPointer, ExtensionType.NonTransferable, ExtensionType.TransferFeeConfig]
     const mintLen = getMintLen(extensions);
@@ -158,15 +139,16 @@ async function createTokenAndMint(): Promise<[string, string]> {
     // Initialize NFT with metadata
     const initSig = await sendAndConfirmTransaction(connection, transaction, [payer, mintKeypair, authority]);
     // Create associated token account
-    const sourceAccount = await createAssociatedTokenAccountIdempotent(connection, payer, mint, owner.publicKey, {}, TOKEN_2022_PROGRAM_ID);
+    const sourceAccount = await createAssociatedTokenAccountIdempotent(connection, payer, mint, ticketOwner, {}, TOKEN_2022_PROGRAM_ID);
     // Mint NFT to associated token account
     const mintSig = await mintTo(connection, payer, mint, sourceAccount, authority, mintAmount, [], undefined, TOKEN_2022_PROGRAM_ID);
-
-    return [initSig, mintSig];
+   
+    return [mintSig, mint];
 
 }
 
-async function burnNNFT(sourceTokenAccount: PublicKey){
+
+async function burnNNFT(sourceTokenAccount: PublicKey, mint: PublicKey){
      // Burn tokens
   let transactionSignature = await burn(
     connection,
@@ -203,4 +185,11 @@ async function burnNNFT(sourceTokenAccount: PublicKey){
   );
 }
 
-main();
+export const mintTicket = async (ticketOwner: PublicKey) => {
+    const [mintSig, mint] = await mintTicketNFT(ticketOwner);
+    console.log(`   ${generateExplorerUrl(mintSig)}`);
+    console.log(`New NFT:`);
+    const mintURL = generateExplorerUrl(mint.toBase58(), true);
+    console.log(`   ${mintURL}`);
+    return mintURL
+}
