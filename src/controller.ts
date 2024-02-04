@@ -6,7 +6,9 @@ export const testEndpoint = (req: Request, res: Response) => {
 };
 
 export const mintTicketEndpoint = async(req: Request, res: Response) => {
-  const userAddress = req.body.address;
-  await mintTicket(userAddress as string);
-  (res as any).json({ message: 'Server is running, and the test is successful!' });
+
+  const { userAddress } = req.body;
+
+  const nftURL = await mintTicket(userAddress as string);
+  (res as any).json({ success: true, url: nftURL});
 };
