@@ -69,8 +69,8 @@ const mintAmount = 1;
 
 function generateExplorerUrl(identifier: string, isAddress: boolean = false): string {
     if (!identifier) return '';
-    const baseUrl = 'https://solana.fm';
-    const localSuffix = '?cluster=localnet-solana';
+    const baseUrl = 'https://explorer.solana.com/';
+    const localSuffix = '?cluster=testnet';
     const slug = isAddress ? 'address' : 'tx';
     return `${baseUrl}/${slug}/${identifier}${localSuffix}`;
 }
@@ -90,20 +90,20 @@ async function main() {
         console.log(`   ${generateExplorerUrl(initSig)}`);
         console.log(`   ${generateExplorerUrl(mintSig)}`);
 
-        // 2. Remove Metadata Field
-        const cleanMetaTxId = await removeMetadataField();
-        console.log(`Metadata field removed:`);
-        console.log(`   ${generateExplorerUrl(cleanMetaTxId)}`);
+        // // 2. Remove Metadata Field
+        // const cleanMetaTxId = await removeMetadataField();
+        // console.log(`Metadata field removed:`);
+        // console.log(`   ${generateExplorerUrl(cleanMetaTxId)}`);
 
-        // 3. Remove Authority
-        const removeAuthTxId = await removeTokenAuthority();
-        console.log(`Authority removed:`);
-        console.log(`   ${generateExplorerUrl(removeAuthTxId)}`);
+        // // 3. Remove Authority
+        // const removeAuthTxId = await removeTokenAuthority();
+        // console.log(`Authority removed:`);
+        // console.log(`   ${generateExplorerUrl(removeAuthTxId)}`);
 
-        // 4. Increment Points
-        const incrementPointsTxId = await incrementPoints(10);
-        console.log(`Points incremented:`);
-        console.log(`   ${generateExplorerUrl(incrementPointsTxId)}`);
+        // // 4. Increment Points
+        // const incrementPointsTxId = await incrementPoints(10);
+        // console.log(`Points incremented:`);
+        // console.log(`   ${generateExplorerUrl(incrementPointsTxId)}`);
 
         // Log New NFT
         console.log(`New NFT:`);

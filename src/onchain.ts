@@ -61,7 +61,7 @@ const tokenMetadata: TokenMetadata = {
     name: 'QN Pixel',
     symbol: 'QNPIX',
     uri: "https://qn-shared.quicknode-ipfs.com/ipfs/QmQFh6WuQaWAMLsw9paLZYvTsdL5xJESzcoSxzb6ZU3Gjx",
-    additionalMetadata: [["Background", "Blue"], ["WrongData", "DeleteMe!"], ["Points", "0"]],
+    additionalMetadata: [["Background", "Blue"]],
 };
 
 //const decimals = 0;
@@ -69,8 +69,8 @@ const mintAmount = 1;
 
 function generateExplorerUrl(identifier: string, isAddress: boolean = false): string {
     if (!identifier) return '';
-    const baseUrl = 'https://solana.fm';
-    const localSuffix = '?cluster=localnet-solana';
+    const baseUrl = 'https://explorer.solana.com/';
+    const localSuffix = '?cluster=testnet';
     const slug = isAddress ? 'address' : 'tx';
     return `${baseUrl}/${slug}/${identifier}${localSuffix}`;
 }
@@ -89,21 +89,6 @@ async function main() {
         console.log(`Token created and minted:`);
         console.log(`   ${generateExplorerUrl(initSig)}`);
         console.log(`   ${generateExplorerUrl(mintSig)}`);
-
-        // 2. Remove Metadata Field
-        const cleanMetaTxId = await removeMetadataField();
-        console.log(`Metadata field removed:`);
-        console.log(`   ${generateExplorerUrl(cleanMetaTxId)}`);
-
-        // 3. Remove Authority
-        const removeAuthTxId = await removeTokenAuthority();
-        console.log(`Authority removed:`);
-        console.log(`   ${generateExplorerUrl(removeAuthTxId)}`);
-
-        // 4. Increment Points
-        const incrementPointsTxId = await incrementPoints(10);
-        console.log(`Points incremented:`);
-        console.log(`   ${generateExplorerUrl(incrementPointsTxId)}`);
 
         // Log New NFT
         console.log(`New NFT:`);
@@ -144,13 +129,13 @@ async function createTokenAndMint(): Promise<[string, string]> {
         ),
 
         createInitializeTransferFeeConfigInstruction(
-        mint,
-        transferFeeConfigAuthority.publicKey,
-        withdrawWithheldAuthority.publicKey,
-        feeBasisPoints,
-        maxFee,
-        TOKEN_2022_PROGRAM_ID
-        ),
+            mint,
+            transferFeeConfigAuthority.publicKey,
+            withdrawWithheldAuthority.publicKey,
+            feeBasisPoints,
+            maxFee,
+            TOKEN_2022_PROGRAM_ID
+            ),
 
         createInitializeMintInstruction(
             mint,
@@ -169,28 +154,6 @@ async function createTokenAndMint(): Promise<[string, string]> {
             symbol: tokenMetadata.symbol,
             uri: tokenMetadata.uri,
         }),
-        createUpdateFieldInstruction({
-            programId: TOKEN_2022_PROGRAM_ID,
-            metadata: mint,
-            updateAuthority: authority.publicKey,
-            field: tokenMetadata.additionalMetadata[0][0],
-            value: tokenMetadata.additionalMetadata[0][1],
-        }),
-        createUpdateFieldInstruction({
-            programId: TOKEN_2022_PROGRAM_ID,
-            metadata: mint,
-            updateAuthority: authority.publicKey,
-            field: tokenMetadata.additionalMetadata[1][0],
-            value: tokenMetadata.additionalMetadata[1][1],
-        }),
-        createUpdateFieldInstruction({
-            programId: TOKEN_2022_PROGRAM_ID,
-            metadata: mint,
-            updateAuthority: authority.publicKey,
-            field: tokenMetadata.additionalMetadata[2][0],
-            value: tokenMetadata.additionalMetadata[2][1],
-        }),
-        //createEnableCpiGuardInstruction(payer.publicKey, owner.publicKey, [], TOKEN_2022_PROGRAM_ID)
     );
     // Initialize NFT with metadata
     const initSig = await sendAndConfirmTransaction(connection, transaction, [payer, mintKeypair, authority]);
@@ -198,8 +161,7 @@ async function createTokenAndMint(): Promise<[string, string]> {
     const sourceAccount = await createAssociatedTokenAccountIdempotent(connection, payer, mint, owner.publicKey, {}, TOKEN_2022_PROGRAM_ID);
     // Mint NFT to associated token account
     const mintSig = await mintTo(connection, payer, mint, sourceAccount, authority, mintAmount, [], undefined, TOKEN_2022_PROGRAM_ID);
-    
-    //await burnNNFT(sourceAccount);
+
     return [initSig, mintSig];
 
 }
@@ -239,75 +201,6 @@ async function burnNNFT(sourceTokenAccount: PublicKey){
     "\nClose Token Account:",
     `https://solana.fm/tx/${transactionSignature}?cluster=devnet-solana`
   );
-}
-
-async function removeMetadataField() {
-    const transaction = new Transaction().add(
-        createRemoveKeyInstruction({
-            programId: TOKEN_2022_PROGRAM_ID,
-            metadata: mint,
-            updateAuthority: authority.publicKey,
-            key: 'WrongData',
-            idempotent: true,
-        })
-    );
-    const signature = await sendAndConfirmTransaction(connection, transaction, [payer, authority]);
-    return signature;
-}
-
-async function removeTokenAuthority(): Promise<string> {
-    const transaction = new Transaction().add(
-        createSetAuthorityInstruction(
-            mint,
-            authority.publicKey,
-            AuthorityType.MintTokens,
-            null,
-            [],
-            TOKEN_2022_PROGRAM_ID
-        )
-    );
-    return await sendAndConfirmTransaction(connection, transaction, [payer, authority]);
-}
-
-async function incrementPoints(pointsToAdd: number = 1) {
-    // Retrieve mint information
-    const mintInfo = await getMint(
-        connection,
-        mint,
-        "confirmed",
-        TOKEN_2022_PROGRAM_ID,
-    );
-
-    const metadataPointer = getMetadataPointerState(mintInfo);
-
-    if (!metadataPointer || !metadataPointer.metadataAddress) {
-        throw new Error('No metadata pointer found');
-    }
-
-    const metadata = await getTokenMetadata(
-        connection,
-        metadataPointer?.metadataAddress,
-    );
-
-    if (!metadata) {
-        throw new Error('No metadata found');
-    }
-    if (metadata.mint.toBase58() !== mint.toBase58()) {
-        throw new Error('Metadata does not match mint');
-    }
-    const [key, currentPoints] = metadata.additionalMetadata.find(([key, _]) => key === 'Points') ?? [];
-    let pointsAsNumber = parseInt(currentPoints ?? '0');
-    pointsAsNumber += pointsToAdd;
-    const transaction = new Transaction().add(
-        createUpdateFieldInstruction({
-            programId: TOKEN_2022_PROGRAM_ID,
-            metadata: mint,
-            updateAuthority: authority.publicKey,
-            field: 'Points',
-            value: pointsAsNumber.toString(),
-        })
-    );
-    return await sendAndConfirmTransaction(connection, transaction, [payer, authority]);
 }
 
 main();
