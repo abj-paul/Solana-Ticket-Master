@@ -37,7 +37,8 @@ import { TokenMetadata, pack } from "@solana/spl-token-metadata";
     mint: mint,
     name: "OPOS",
     symbol: "OPOS",
-    uri: "https://i.pinimg.com/736x/ca/23/5e/ca235e787ebc3c182d0a89c8629da934.jpg"
+    uri: "https://i.pinimg.com/736x/ca/23/5e/ca235e787ebc3c182d0a89c8629da934.jpg",
+    additionalMetadata: []
   };
   
 
