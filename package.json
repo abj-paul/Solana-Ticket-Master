@@ -14,6 +14,7 @@
     "assert": "*",
     "body-parser": "^1.20.2",
     "borsh": "0.7.0",
+    "cors": "^2.8.5",
     "express": "^4.18.2",
     "nodemon": "^3.0.3",
     "ts-node-dev": "^2.0.0"
@@ -21,6 +22,7 @@
   "devDependencies": {
     "@types/bn.js": "^5.1.1",
     "@types/chai": "^4.3.5",
+    "@types/cors": "^2.8.17",
     "@types/express": "^4.17.21",
     "@types/mocha": "^10.0.1",
     "@types/node": "^20.11.16",
