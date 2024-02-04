@@ -15,10 +15,17 @@ export const mintTicketEndpoint = async(req: Request, res: Response) => {
 
 export const getNFTEndpoint = async(req: Request, res: Response) => {
 
-  const { userAddress } = req.body;
+  const { userAddress } = req.query;
 
-  const nfts = await getNFTs(userAddress as string);
-  (res as any).json({ success: true, nfts});
+  const nfts = (await getNFTs(userAddress as string)) as Array<any>;
+  const mftAddresses = [];
+  for (let index = 0; index < nfts.length; index++) {
+      const elm = nfts[index];
+      const ata = elm.pubkey;
+      const mint = elm.account.data.parsed.info.mint;
+      mftAddresses.push({ata, mint})
+  }
+  (res as any).json({ success: true, mftAddresses});
 };
 
 export const verifyNFTEndpoint = async(req: Request, res: Response) => {
